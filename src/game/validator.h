@@ -1,9 +1,10 @@
 #pragma once
 #include <cstdint>
 
-class validator{
+class Validator{
     public:
-        
+        bool is_valid(); // returns 0 if not valid move, returns 1 if vaild
+        void initialise(); // initialises all validation data
 
     private:
         // general piece move validation biboards
@@ -24,4 +25,13 @@ class validator{
         bool white_castle_qs;
         bool black_castle_ks;
         bool black_castle_qs;
+        //
+
+        // move bitboard functions
+        void init_knight_moves();
+        void init_pawn_moves();
+        void init_king_moves();
+        void init_rook_moves();
+        void init_bishop_moves();
+        //
 };
