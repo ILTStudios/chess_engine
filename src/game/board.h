@@ -16,6 +16,7 @@ class Board{
         uint64_t get_white_bishops() const;
         uint64_t get_white_king() const;
         uint64_t get_white_queen() const;
+        uint64_t get_white_pieces() const;
             //
             
             // black
@@ -25,6 +26,7 @@ class Board{
         uint64_t get_black_bishops() const;
         uint64_t get_black_king() const;
         uint64_t get_black_queen() const;
+        uint64_t get_black_pieces() const;
             //
         //
 

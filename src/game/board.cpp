@@ -4,6 +4,7 @@
 #include "board.h"
 
 using namespace std;
+
 // initialises the board variables
 void Board::initialise(){
     // setting up all piece bitboards for standard game (white)
@@ -123,41 +124,47 @@ void Board::move_piece(int from_square, int to_square){
     // white
 uint64_t Board::get_white_pawns() const{
     return white_pawns;
-};
+}
 uint64_t Board::get_white_rooks() const{
     return white_rooks;
-};;
+}
 uint64_t Board::get_white_knights() const{
     return white_knights;
-};;
+}
 uint64_t Board::get_white_bishops() const{
     return white_bishops;
-};;
+}
 uint64_t Board::get_white_king() const{
     return white_king;
-};;
+}
 uint64_t Board::get_white_queen() const{
     return white_queen;
-};;
+}
+uint64_t Board::get_white_pieces() const{
+    return white_pieces;
+}
     //
     
     // black
 uint64_t Board::get_black_pawns() const{
     return black_pawns;
-};;
+}
 uint64_t Board::get_black_rooks() const{
     return black_rooks;
-};;
+}
 uint64_t Board::get_black_knights() const{
     return black_knights;
-};;
+}
 uint64_t Board::get_black_bishops() const{
     return black_bishops;
-};;
+}
 uint64_t Board::get_black_king() const{
     return black_king;
-};;
+}
 uint64_t Board::get_black_queen() const{
     return black_queen;
-};;
+}
+uint64_t Board::get_black_pieces() const{
+    return black_pieces;
+}
     //

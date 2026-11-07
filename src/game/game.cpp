@@ -9,11 +9,12 @@ int main(){
     int player_turn = 1;
     bool has_ended = false;
 
-    int raw_from_index;
-    int raw_to_index;
+    int from_index;
+    int to_index;
 
     class Board board;
     board.initialise();
+    board.display();
 
     class Validator validator;
     validator.initialise();
@@ -22,28 +23,24 @@ int main(){
 
     while (has_ended == false)
     {
-        board.display();
-
         // get input from player
         input.get_input(player_turn);
-        raw_from_index = input.get_input_from();
-        raw_to_index = input.get_input_to();
+        from_index = input.get_input_from();
+        to_index = input.get_input_to();
 
         // validate the move
-
-        // change player turn
-        // player_turn = 0;
-        // input.get_input(player_turn);
-        // raw_from_index = input.get_input_from();
-        // raw_to_index = input.get_input_to();
-
-        // validate the move
-
+        if(!validator.is_valid(player_turn, from_index, to_index, board)){
+            cout << "Invalid Move! Try again\n";
+            continue;
+        }
         // change the board state
-        board.move_piece(raw_from_index, raw_to_index);
+        board.move_piece(from_index, to_index);
 
-        //reset player turn
-        player_turn = 1;
+        // display board
+        board.display();
+
+        // switch player
+        player_turn = (player_turn == 1) ? 0 : 1;
     }
 
     return 0;

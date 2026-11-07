@@ -1,9 +1,11 @@
 #pragma once
 #include <cstdint>
 
+class Board;
+
 class Validator{
     public:
-        bool is_valid(); // returns 0 if not valid move, returns 1 if vaild
+        bool is_valid(int player_turn, int from_square, int to_square, const Board & board); // returns 0 if not valid move, returns 1 if vaild
         void initialise(); // initialises all validation data
 
     private:
@@ -34,4 +36,13 @@ class Validator{
         void init_rook_moves();
         void init_bishop_moves();
         //
+
+        // validation functions
+        bool is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_turn, const Board &board);
+        bool is_valid_pawn_move(int from_mask, uint64_t to_mask, int player_turn, const Board &board);
+        bool is_valid_knight_move(int from_mask, uint64_t to_mask);
+        bool is_valid_bishop_move(int from_mask, uint64_t to_mask, const Board &board);
+        bool is_valid_rook_move(int from_mask, uint64_t to_mask, const Board &board);
+        bool is_valid_king_move(int from_mask, uint64_t to_mask);
+        bool is_valid_queen_move(int from_mask, uint64_t to_mask, const Board &board);
 };
