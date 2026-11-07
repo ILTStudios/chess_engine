@@ -39,6 +39,7 @@ class Validator{
 
         // validation functions
         bool is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_turn, const Board &board);
+        bool is_path_clear(int from_index, int to_index, const Board &board);
         bool is_valid_pawn_move(int from_mask, uint64_t to_mask, int player_turn, const Board &board);
         bool is_valid_knight_move(int from_mask, uint64_t to_mask);
         bool is_valid_bishop_move(int from_mask, uint64_t to_mask, const Board &board);

@@ -214,15 +214,59 @@ char what_piece(uint64_t from_mask, const Board &board){
 }
 
 // is_valid_move supplementary functions
+bool Validator::is_path_clear(int from_index, int to_index, const Board &board){
+    uint64_t occupied = board.get_white_pieces() | board.get_black_pieces();
+
+    int from_rank = from_index / 8;
+    int from_file = from_index % 8;
+
+    int to_rank = to_index / 8;
+    int to_file = to_index % 8;
+
+    int rank_direction = (to_rank > from_rank) - (to_rank < from_rank);
+    int file_direction = (to_file > from_file) - (to_file < from_file);
+
+    int current_rank = from_rank + rank_direction;
+    int current_file = from_file + file_direction;
+
+    while (current_rank != to_rank || current_file != to_file) {
+
+        int current_square = current_rank * 8 + current_file;
+        uint64_t current_mask = 1ULL << current_square;
+
+        if (occupied & current_mask) {
+            return false;
+        }
+
+        current_rank += rank_direction;
+        current_file += file_direction;
+    }
+
+    return true;
+}
 bool Validator::is_valid_pawn_move(int from_square, uint64_t to_mask, int player_turn, const Board &board){
     uint64_t occupied = board.get_white_pieces() | board.get_black_pieces();
 
     if (player_turn == 1) {
-        if (w_pawn_moves[from_square] & to_mask) return (occupied & to_mask) == 0;
+        if (w_pawn_moves[from_square] & to_mask){
+            if(occupied & to_mask) return false;
+            if (abs(__builtin_ctzll(to_mask) - from_square) == 16) {
+                uint64_t intermediate_mask = 1ULL << (from_square + 8);
+                if (occupied & intermediate_mask) return false;
+            }
+            return true;
+        }
         if (w_pawn_captures[from_square] & to_mask) return (board.get_black_pieces() & to_mask) != 0;
 
     }else if (player_turn == 0) {
-        if (b_pawn_moves[from_square] & to_mask) return (occupied & to_mask) == 0;
+        if (b_pawn_moves[from_square] & to_mask){
+            if(occupied & to_mask) return false;
+            if (abs(__builtin_ctzll(to_mask) - from_square) == 16) {
+                uint64_t intermediate_mask = 1ULL << (from_square - 8);
+                if (occupied & intermediate_mask) return false;
+            }
+            return true; 
+        } 
         if (b_pawn_captures[from_square] & to_mask) return (board.get_white_pieces() & to_mask) != 0;
     }else cout << "Invalid Internal Variable Player Turn!" << endl;
     
@@ -232,16 +276,19 @@ bool Validator::is_valid_knight_move(int from_square, uint64_t to_mask){
    return (knight_moves[from_square] & to_mask) != 0;
 }
 bool Validator::is_valid_bishop_move(int from_square, uint64_t to_mask, const Board &board){
-    
+    if (!(bishop_moves[from_square] & to_mask)) return false;
+    return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
 bool Validator::is_valid_rook_move(int from_square, uint64_t to_mask, const Board &board){
-    
+    if (!(rook_moves[from_square] & to_mask)) return false;
+    return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
 bool Validator::is_valid_king_move(int from_square, uint64_t to_mask){
     return (king_moves[from_square] & to_mask) != 0;
 }
 bool Validator::is_valid_queen_move(int from_square, uint64_t to_mask, const Board &board){
-    
+    if (!(queen_moves[from_square] & to_mask)) return false;
+    return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
 // checks whether that was a valid move according to that piece
 bool Validator::is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_turn, const Board &board){
@@ -277,7 +324,6 @@ bool Validator::is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_t
             return false;
     }
 }
-
 
 bool Validator::is_valid(int player_turn, int from_square, int to_square, const Board &board){
     uint64_t from_mask = (1ULL << from_square);
