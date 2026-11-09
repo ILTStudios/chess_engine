@@ -1,0 +1,27 @@
+body{
+    background-color: #272727;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+img{
+    width: 64px; height: 64px;
+}
+
+.board{
+    width: 512px; height: 512px;
+    display: grid;
+    grid-template-columns: 64px 64px 64px 64px 64px 64px 64px 64px;
+    grid-template-rows: 64px 64px 64px 64px 64px 64px 64px 64px;
+}
+
+.square_w{
+    width: 64px; height: 64px;
+    background-color: #fff;
+}
+.square_b{
+    width: 64px; height: 64px;
+    background-color: black;
+}
