@@ -39,6 +39,17 @@ int main(){
         // display board
         board.display();
 
+        // check whether you are in stalemate or checkmate
+        if(validator.is_in_checkmate(board, player_turn) == true){
+            has_ended = true;
+            cout << "The game has ended in checkmate!" << endl;
+        }
+        if(validator.is_in_stalemate(board, player_turn) == true){
+            has_ended = true;
+            cout << "The game has ended in stalemate!" << endl; 
+        }
+        //
+
         // switch player
         player_turn = (player_turn == 1) ? 0 : 1;
     }

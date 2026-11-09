@@ -324,7 +324,113 @@ bool Validator::is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_t
             return false;
     }
 }
+bool Validator::has_legal_moves(const Board &board, int player_turn){
+    uint64_t own_pieces = (player_turn == 1) ? board.get_white_pieces() : board.get_black_pieces();
+    while(own_pieces){
+        int from_square = __builtin_ctzll(own_pieces);
+        for(int to_square; to_square < 64; to_square += 1){
+            if(from_square == to_square) continue; // we are on the same square
 
+            if(!is_valid(player_turn, from_square, to_square, board)) continue; // that kind of movement is not valid
+
+            Board temporary_brd = board; // mk a temp board
+            temporary_brd.move_piece(from_square, to_square); // make that move
+            if(!is_in_check(temporary_brd, player_turn)) return true; // if that move does not leave you in check, wallahi you made it and there are legal moves
+        }
+
+        own_pieces &= own_pieces - 1;
+    }
+
+    return false;
+}
+bool Validator::is_square_attacked(int square, int player_turn, const Board &board){
+    uint64_t attack_mask = (1ULL << square);
+
+    uint64_t attacking_pieces = (player_turn == 1) ? board.get_white_pieces() : board.get_black_pieces();
+
+    while(attacking_pieces){
+        int from_square = __builtin_ctzll(attacking_pieces);
+        uint64_t from_mask = (1ULL << from_square);
+
+        char piece = what_piece(from_mask, board);
+
+        switch (piece)
+        {
+            case 'P':
+                if (w_pawn_captures[from_square] & attack_mask)
+                    return true;
+                break;
+
+            case 'p':
+                if (b_pawn_captures[from_square] & attack_mask)
+                    return true;
+                break;
+
+            case 'N':
+            case 'n':
+                if (knight_moves[from_square] & attack_mask)
+                    return true;
+                break;
+
+            case 'B':
+            case 'b':
+                if (is_valid_bishop_move(from_square, attack_mask, board))
+                    return true;
+                break;
+
+            case 'R':
+            case 'r':
+                if (is_valid_rook_move(from_square, attack_mask, board))
+                    return true;
+                break;
+
+            case 'Q':
+            case 'q':
+                if (is_valid_queen_move(from_square, attack_mask, board))
+                    return true;
+                break;
+
+            case 'K':
+            case 'k':
+                if (king_moves[from_square] & attack_mask)
+                    return true;
+                break;
+        }
+        
+        attacking_pieces &= attacking_pieces - 1;
+    }
+
+    return false;
+}
+bool Validator::is_in_check(const Board &board, int player_turn){
+    uint64_t own_pieces = (player_turn == 1) ? board.get_white_pieces() : board.get_black_pieces();
+    int king_square = -1;
+
+    while(own_pieces){
+        int square = __builtin_ctzll(own_pieces);
+        uint64_t mask = (1ULL << square);
+        char piece = what_piece(square, board);
+
+        if(piece == 'K' || piece == 'k'){
+            king_square = square;
+            break;
+        }
+
+        own_pieces &= own_pieces - 1;
+
+    }
+
+    if(king_square == -1) return false;
+
+    int opponent = (player_turn == 1) ? 0 : 1;
+    return is_square_attacked(king_square, opponent, board);
+}
+bool Validator::is_in_checkmate(const Board &board, int player_turn){
+    return is_in_check(board, player_turn) && !has_legal_moves(board, player_turn);
+}
+bool Validator::is_in_stalemate(const Board &board, int player_turn){
+    return !is_in_check(board, player_turn) && !has_legal_moves(board, player_turn);
+}
 bool Validator::is_valid(int player_turn, int from_square, int to_square, const Board &board){
     uint64_t from_mask = (1ULL << from_square);
     uint64_t to_mask = (1ULL << to_square);
@@ -341,7 +447,14 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
         cout << "That is not a valid move! Try again" << endl;
         return 0;
     }
-
+    //
+    
+    // is the king in check?
+    if(!is_in_check(board, player_turn)){
+        cout << "That leaves your king in check!" << endl;
+        return 0;
+    }
+    //
     
     return 1;
 }
