@@ -42,7 +42,32 @@ FEN.split("").forEach((element, index) => {
         let image = document.createElement("img");
         image.src = `./src/${element === element.toUpperCase() ? "w" : "b"}${element.toLowerCase()}.png`;        
         document.getElementById(`${square_index + 1}`).appendChild(image);
+        image.draggable = true;
         square_index += 1;
     }
 });
 
+// drag and drop type shit
+const boardElement = document.getElementById("board");
+let draggedPiece = null;
+// When you start a drag
+boardElement.addEventListener("dragstart", (event) => {
+    if (event.target.tagName === "IMG") draggedPiece = event.target;
+});
+// let em drop
+boardElement.addEventListener("dragover", (event) => {
+    event.preventDefault();
+});
+// when dropped
+boardElement.addEventListener("drop", (event) => {
+    event.preventDefault();
+    let targetSquare = event.target.closest("#board > div");
+    if (!targetSquare || !draggedPiece) return;
+    // remove piece if there
+    let existingPiece = targetSquare.querySelector("img");
+    if (existingPiece) existingPiece.remove();
+    // move to destination
+    targetSquare.appendChild(draggedPiece);
+    draggedPiece = null;
+
+});
