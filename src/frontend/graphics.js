@@ -23,6 +23,8 @@ for(let square = 1; square < 65; square += 1){
         rank += 1;
     }
 }
+
+// display FEN string
 const isNumeric = (string) => /^[+-]?\d+(\.\d+)?$/.test(string)
 const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 let square_index = 0;
@@ -69,5 +71,4 @@ boardElement.addEventListener("drop", (event) => {
     // move to destination
     targetSquare.appendChild(draggedPiece);
     draggedPiece = null;
-
 });

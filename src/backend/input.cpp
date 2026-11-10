@@ -55,12 +55,6 @@ int Input::authenticate_input(string move){
         to_index = string_to_index(to_square);
         //
 
-        // cout << "From mask: " << from_mask << endl;
-        // cout << "To mask: " << to_mask << endl;
-
-        // cout << "From index: " << string_to_index(from_square) << endl;
-        // cout << "To index: " << string_to_index(to_square) << endl;
-
         return 1; //change validate so that the next player has a go
     }
 }
