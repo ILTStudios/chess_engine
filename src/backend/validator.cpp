@@ -263,6 +263,11 @@ bool Validator::is_valid_bishop_move(int from_square, uint64_t to_mask, const Bo
     return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
 bool Validator::is_valid_rook_move(int from_square, uint64_t to_mask, const Board &board){
+    
+    // casteling
+
+    //
+
     if (!(rook_moves[from_square] & to_mask)) return false;
     return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
@@ -365,10 +370,9 @@ bool Validator::is_square_attacked(int square, int player_turn, const Board &boa
 
 // checks whether you are in check or not (required for has_legal_moves)
 bool Validator::is_in_check(const Board &board, int player_turn){
-    uint64_t own_pieces = (player_turn == 1) ? board.get_white_pieces() : board.get_black_pieces(); // get your pieces
     uint64_t king = (player_turn == 1) ? board.get_white_king() : board.get_black_king(); // gets your king
-    int king_square = __builtin_ctzll(king); // produce a king square and set a value not on board
     if(king == 0) return false; // not in check
+    int king_square = __builtin_ctzll(king); // produce a king square and set a value not on board
     int opponent = (player_turn == 1) ? 0 : 1; // get the opponent
     return is_square_attacked(king_square, opponent, board); // if the opponent is attacking you, you are in check
 }
@@ -423,9 +427,11 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
     //
     
     // is the king in check?
-    if(is_in_check(board, player_turn)){
-        cout << "That leaves your king in check!" << endl;
-        return 0;
+    Board temporary_board = board;
+    temporary_board.move_piece(from_square, to_square);
+
+    if(is_in_check(temporary_board, player_turn)){
+        return false;
     }
     //
     

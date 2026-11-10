@@ -2,59 +2,65 @@
 #include "input.h" // gets and parses the input from the player
 #include "board.h" // handles all the game board variables and what not
 #include "validator.h" // contians all the code to validate moves
-#include "httplib.h" // helps connect to an http server
-#include "json.hpp" // helps handle post and request data from the server
+#include "game.h" // includes the game header
 
 using namespace std;
 
-int main(){
-    int player_turn = 1;
-    bool has_ended = false;
+void Game::initialise(){
+    player_turn = 1;
+    has_ended = false;
 
-    int from_index;
-    int to_index;
-
-    class Board board;
+    // initialise and display the board
     board.initialise();
     board.display();
+    //
 
-    class Validator validator;
+    // initialise the validator
     validator.initialise();
+    //
+}
 
-    class Input input;
+string Game::validate(string move){
+    if(input.authenticate_input(move) == 0) return "Incorrect move structure!";
+    if(!validator.is_valid(player_turn, from_index, to_index, board)) return "Invalid! Try again";
+    if(validator.is_in_checkmate(board, player_turn)) return "Checkmate! Game end";
+    if(validator.is_in_stalemate(board, player_turn)) return "Stalemate! Game end";
+}
 
-    while (has_ended == false)
-    {
-        // get input from player
-        input.get_input(player_turn);
-        from_index = input.get_input_from();
-        to_index = input.get_input_to();
+void Game::update_game_state(int from, int to, int pt){
+    board.move_piece(from, to);
+    player_turn = pt;
+}
 
-        // validate the move
-        if(!validator.is_valid(player_turn, from_index, to_index, board)){
-            cout << "Invalid Move! Try again\n";
-            continue;
-        }
-        // change the board state
-        board.move_piece(from_index, to_index);
-
-        // display board
-        board.display();
-
-        // check whether you are in stalemate or checkmate
-        if(validator.is_in_checkmate(board, player_turn) == true){
-            has_ended = true;
-            cout << "The game has ended in checkmate!" << endl;
-        }
-        if(validator.is_in_stalemate(board, player_turn) == true){
-            has_ended = true;
-            cout << "The game has ended in stalemate!" << endl; 
-        }
-        //
-
-        // switch player
-        player_turn = (player_turn == 1) ? 0 : 1;
+void Game::make_move(int from, int to){
+    from_index = from; to_index = to;
+    // validate the move
+    if(!validator.is_valid(player_turn, from_index, to_index, board)){
+        cout << "Invalid Move! Try again\n";
+        return;
     }
+    //
 
-    return 0;
+    // change the board state
+    board.move_piece(from_index, to_index);
+    //
+
+    // display board
+    board.display();
+    //
+
+    // check whether you are in stalemate or checkmate
+    if(validator.is_in_checkmate(board, player_turn) == true){
+        has_ended = true;
+        cout << "The game has ended in checkmate!" << endl;
+    }
+    if(validator.is_in_stalemate(board, player_turn) == true){
+        has_ended = true;
+        cout << "The game has ended in stalemate!" << endl; 
+    }
+    //
+
+    // switch player
+    player_turn = (player_turn == 1) ? 0 : 1;
+    //
 }
