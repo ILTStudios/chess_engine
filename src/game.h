@@ -5,16 +5,21 @@ using namespace std;
 #include "validator.h"
 #include "input.h"
 
+#include <vector>
+#include <string>
+#include <thread>
+#include <chrono>
+
 
 class Game{
     public:
         // functions
-        void initialise(); // initialises the game
+        void initialise(string FEN); // initialises the game
         void get_input(); // redundant, don't really need it for browser
         void make_move(); // redundant too
         string validate();
         void update_game_state(int from, int to, int pt);
-        void run();
+        void run(string MOVESET, bool automatic);
         //
     private:
         // variables

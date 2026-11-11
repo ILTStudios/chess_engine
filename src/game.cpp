@@ -1,4 +1,8 @@
 #include <iostream>
+#include <vector>
+#include <string>
+#include <thread>
+#include <chrono>
 #include "input.h" // gets and parses the input from the player
 #include "board.h" // handles all the game board variables and what not
 #include "validator.h" // contians all the code to validate moves
@@ -6,12 +10,12 @@
 
 using namespace std;
 
-void Game::initialise(){
+void Game::initialise(string FEN){
     player_turn = 1;
     has_ended = false;
 
     // initialise and display the board
-    board.initialise("");
+    board.initialise(FEN);
     board.display();
     //
 
@@ -20,13 +24,32 @@ void Game::initialise(){
     //
 }
 
-void Game::run(){
-    while(has_ended == false){
+void Game::run(string MOVESET, bool automatic){
+    if(automatic == false){
+        while(has_ended == false){
         input.get_input(player_turn);
         from_index = input.get_input_from();
         to_index = input.get_input_to();
 
         make_move();
+        }   
+    }
+    else{
+        vector<string> moves;
+        stringstream ss(MOVESET);
+        string move;
+
+        while (ss >> move) {
+            moves.push_back(move);
+        }
+        for (string move : moves){
+            input.authenticate_input(move);
+            from_index = input.get_input_from();
+            to_index = input.get_input_to();
+
+            make_move();
+            this_thread::sleep_for(chrono::milliseconds(100));
+        }
     }
 }
 
