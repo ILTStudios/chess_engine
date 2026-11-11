@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <cstdint>
 
 #include "board.h"
@@ -6,31 +7,74 @@
 using namespace std;
 
 // initialises the board variables
-void Board::initialise(){
-    // setting up all piece bitboards for standard game (white)
-    white_rooks = (1ULL << 0) | (1ULL << 7);
-    white_knights = (1ULL << 1) | (1ULL << 6);
-    white_bishops = (1ULL << 2) | (1ULL << 5);
-    white_queen = (1ULL << 3);
-    white_king = (1ULL << 4);
-    white_pawns = (0xFFULL << 8);
+void Board::initialise(string FEN){
+    // reset all pieces
+    white_rooks = white_knights = white_bishops = white_queen = white_king = white_pawns = 0ULL;
+    black_rooks = black_knights = black_bishops = black_queen = black_king = black_pawns = 0ULL;
     //
 
-    // setting up all piece bitboards for standard game (black)
-    black_rooks = (1ULL << 63) | (1ULL << 56);
-    black_knights = (1ULL << 62) | (1ULL << 57);
-    black_bishops = (1ULL << 61) | (1ULL << 58);
-    black_queen = (1ULL << 59);
-    black_king = (1ULL << 60);
-    black_pawns = (0xFFULL << 48);
-    //
+    if (FEN.empty()) {
+        FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    }
 
-    // setting up all supplementary bitboards for standard game
-    white_pieces = white_rooks | white_knights | white_bishops | white_queen | white_king | white_pawns;
-    black_pieces = black_rooks | black_knights | black_bishops | black_queen | black_king | black_pawns;
+    string placement;
+    stringstream ss(FEN);
+    ss >> placement;
+
+    int rank = 0;
+    int file = 0;
+
+    for(char c : placement){
+
+        if(c == '/'){
+            rank += 1;
+            file = 0;
+            continue;
+        }
+
+        if (isdigit(static_cast<unsigned char>(c))) {
+            int number_of_empty = c - '0';
+            file += number_of_empty;
+            continue;
+        }
+
+        int square = (7 - rank) * 8 + file;
+        uint64_t square_mask = 1ULL << square;
+
+        switch (c) {
+
+            // White pieces
+            case 'R': white_rooks   |= square_mask; break;
+            case 'N': white_knights |= square_mask; break;
+            case 'B': white_bishops |= square_mask; break;
+            case 'Q': white_queen   |= square_mask; break;
+            case 'K': white_king    |= square_mask; break;
+            case 'P': white_pawns   |= square_mask; break;
+
+            // Black pieces
+            case 'r': black_rooks   |= square_mask; break;
+            case 'n': black_knights |= square_mask; break;
+            case 'b': black_bishops |= square_mask; break;
+            case 'q': black_queen   |= square_mask; break;
+            case 'k': black_king    |= square_mask; break;
+            case 'p': black_pawns   |= square_mask; break;
+        }
+
+        file += 1;
+
+    }
+
+    white_pieces =
+        white_rooks | white_knights | white_bishops |
+        white_queen | white_king | white_pawns;
+
+    black_pieces =
+        black_rooks | black_knights | black_bishops |
+        black_queen | black_king | black_pawns;
+
     occupied_spaces = white_pieces | black_pieces;
     empty_squares = ~occupied_spaces;
-    //
+
 }
 
 // displays the board

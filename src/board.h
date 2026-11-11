@@ -1,9 +1,10 @@
 #pragma once
 #include <cstdint>
+using namespace std;
 
 class Board{
     public:
-        void initialise();
+        void initialise(string FEN);
         void display();
         void remove_piece(uint64_t mask);        
         void move_piece(int from_square, int to_square);

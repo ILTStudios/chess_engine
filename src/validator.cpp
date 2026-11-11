@@ -216,7 +216,10 @@ bool Validator::is_path_clear(int from_index, int to_index, const Board &board){
     while (current_rank != to_rank || current_file != to_file) {
         int current_square = current_rank * 8 + current_file; // get the current square we are scanning
         uint64_t current_mask = 1ULL << current_square; // create a mask for that
-        if (occupied & current_mask) return false; // if the mask overlaps the occupied bitboard, return false
+        if (occupied & current_mask) { // if the mask overlaps the occupied bitboard, return false
+            // cout << "The Path was not clear!\n";
+            return false;
+        }
         
         current_rank += rank_direction; // update the next rank
         current_file += file_direction; // update the next file
@@ -239,10 +242,11 @@ bool Validator::is_valid_pawn_move(int from_square, uint64_t to_mask, int player
     if(pawn_moves & to_mask){ // if it is a normal pawn move
         if(occupied & to_mask) return false; // that piece is currently occupied
         int direction = (player_turn == 1) ? 8 : -8; // figure out if we're advancing forward or backwards
-        if(to_mask == (1ULL << from_square + 2 * direction)){
-            uint64_t intermediate = (1ULL << (from_square + 8));
+        if(to_mask == (1ULL << (from_square + 2 * direction))){
+            uint64_t intermediate = (1ULL << (from_square + direction));
             if (occupied & intermediate) return false;
         }
+        return true;
     }
     if(pawn_captures & to_mask) return (enemy_pieces & to_mask) != 0; // if capturing
     //
@@ -414,14 +418,14 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
 
     // is that your piece?
     if(!is_own_piece(from_mask, to_mask, player_turn, board)){
-        cout << "You are either moving an enemy piece, or attacking your own!" << endl;
+        // cout << "You are either moving an enemy piece, or attacking your own!" << endl;
         return 0;
     }
     //
 
     // checks whether that was a valid move according to what piece it is
     if(!is_valid_move(from_mask, to_mask, player_turn, board)){
-        cout << "That is not a valid move! Try again" << endl;
+        // cout << "That is not a valid move! Try again" << endl;
         return 0;
     }
     //

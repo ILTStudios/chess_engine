@@ -11,7 +11,7 @@ void Game::initialise(){
     has_ended = false;
 
     // initialise and display the board
-    board.initialise();
+    board.initialise("");
     board.display();
     //
 
@@ -20,8 +20,17 @@ void Game::initialise(){
     //
 }
 
-string Game::validate(string move){
-    if(input.authenticate_input(move) == 0) return "Incorrect move structure!";
+void Game::run(){
+    while(has_ended == false){
+        input.get_input(player_turn);
+        from_index = input.get_input_from();
+        to_index = input.get_input_to();
+
+        make_move();
+    }
+}
+
+string Game::validate(){
     if(!validator.is_valid(player_turn, from_index, to_index, board)) return "Invalid! Try again";
     if(validator.is_in_checkmate(board, player_turn)) return "Checkmate! Game end";
     if(validator.is_in_stalemate(board, player_turn)) return "Stalemate! Game end";
@@ -34,8 +43,7 @@ void Game::update_game_state(int from, int to, int pt){
     player_turn = pt;
 }
 
-void Game::make_move(int from, int to){
-    from_index = from; to_index = to;
+void Game::make_move(){
     // validate the move
     if(!validator.is_valid(player_turn, from_index, to_index, board)){
         cout << "Invalid Move! Try again\n";
