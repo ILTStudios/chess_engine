@@ -57,11 +57,11 @@ int Input::authenticate_input(string move){
 
         from_index = string_to_index(from_square);
         to_index = string_to_index(to_square);
-
+        promotion_piece = "";
         if(move.length() == 5){
-            promotion_piece = move[4];
+            promotion_piece = move.substr(4, 1);
         }
-        promotion_piece = '\0';
+
         //
 
         return 1; //change validate so that the next player has a go

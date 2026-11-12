@@ -349,7 +349,6 @@ bool Validator::is_valid_pawn_move(int from_square, uint64_t to_mask, int player
         }
         return true;
     }
-    if(pawn_captures & to_mask) return (enemy_pieces & to_mask) != 0; // if capturing
     //
 
     // en passen
@@ -366,9 +365,7 @@ bool Validator::is_valid_pawn_move(int from_square, uint64_t to_mask, int player
     }
     //
 
-    // promotion
-
-    //
+    if(pawn_captures & to_mask) return (enemy_pieces & to_mask) != 0; // if capturing
 
     return false;
 }
