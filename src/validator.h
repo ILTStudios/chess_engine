@@ -43,6 +43,7 @@ class Validator{
         bool is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_turn, const Board &board);
         bool is_path_clear(int from_index, int to_index, const Board &board);
         bool is_valid_castle(int from_square, int to_square, int player_turn, const Board &board);
+        void update_castleing_rights(int from_square, int to_square);
         bool is_in_check(const Board &board, int player_turn);
         bool has_legal_moves(const Board &board, int player_turn);
         bool is_square_attacked(int square, int player_turn, const Board &board);

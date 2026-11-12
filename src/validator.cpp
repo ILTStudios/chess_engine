@@ -244,14 +244,88 @@ bool Validator::is_valid_castle(int from_square, int to_square, int player_turn,
     int opponent = white ? 0 : 1;
 
     if(to_square == king_start + 2){
+        if (white ? !white_castle_ks : !black_castle_ks) return false;
 
+        rook_square = white ? 7 : 63;
+        king_to_square = king_start + 1;
+        destination_square = king_start + 2;
+
+        uint64_t occupied = board.get_white_pieces() | board.get_black_pieces();
+
+        if (occupied & (1ULL << king_to_square)) return false;
+        if (occupied & (1ULL << destination_square)) return false;
     }
     else if(to_square == king_start - 2){
+        if (white ? !white_castle_qs : !black_castle_qs) return false;
 
+        rook_square = white ? 0 : 56;
+        king_to_square = king_start - 1;
+        destination_square = king_start - 2;
+
+        uint64_t occupied = board.get_white_pieces() | board.get_black_pieces();
+
+        // if queenside, then b file gotta be empty
+        int extra_square = king_start - 3;
+
+        if (occupied & (1ULL << extra_square)) return false;
+        if (occupied & (1ULL << king_to_square)) return false;
+        if (occupied & (1ULL << destination_square)) return false;
     }
     else{
         return false;
     }
+
+    uint64_t rook_mask = 1ULL << rook_square; // get the rook mask
+
+    if (white) {
+        if (!(board.get_white_rooks() & rook_mask)) return false; // is the rook actually there?
+    }
+    else {
+        if (!(board.get_black_rooks() & rook_mask)) return false; // same question answered here
+    }
+
+    // does king pass through attacked square
+    Board temporary_board = board;
+    temporary_board.move_piece(from_square, king_to_square);
+
+    if (is_square_attacked(king_to_square, opponent, temporary_board)) return false;
+
+    temporary_board = board;
+    temporary_board.move_piece(from_square, destination_square);
+
+    if (is_square_attacked(destination_square, opponent, temporary_board)) return false;
+
+    return true;
+}
+    //
+
+    // upate all casteling rights
+void Validator::update_castleing_rights(int from_square, int to_square){
+    // if white king moves
+    if (from_square == 4) {
+        white_castle_ks = false;
+        white_castle_qs = false;
+    }
+
+    // if black king moves
+    if (from_square == 60) {
+        black_castle_ks = false;
+        black_castle_qs = false;
+    }
+
+    // if white rooks move
+    if (from_square == 0) white_castle_qs = false;
+    if (from_square == 7) white_castle_ks = false;
+
+    // if black rooks move
+    if (from_square == 56) black_castle_qs = false;
+    if (from_square == 63) black_castle_ks = false;
+
+    // if a rook was captured
+    if (to_square == 0) white_castle_qs = false;
+    if (to_square == 7) white_castle_ks = false;
+    if (to_square == 56) black_castle_qs = false;
+    if (to_square == 63) black_castle_ks = false;
 }
     //
 
@@ -465,6 +539,8 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
         return false;
     }
     //
+
+    update_castleing_rights(from_square, to_square);
     
     return 1;
 }
