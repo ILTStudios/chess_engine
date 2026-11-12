@@ -11,6 +11,7 @@ class Validator{
         bool is_in_stalemate(const Board &board, int player_turn);
         char what_piece(uint64_t from_mask, const Board &board);
         void update_castleing_rights(int from_square, int to_square);
+        int enpassen_square;
 
     private:
         // general piece move validation biboards
@@ -26,7 +27,6 @@ class Validator{
         //
 
         // special piece move validation data
-        int enpassen_square;
         bool white_castle_ks;
         bool white_castle_qs;
         bool black_castle_ks;

@@ -8,6 +8,7 @@ class Board{
         void display();
         void remove_piece(uint64_t mask);        
         void move_piece(int from_square, int to_square);
+        void promote_piece(int square, char promotion);
 
         // public getter functions to expose board data
             // white

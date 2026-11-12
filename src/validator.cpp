@@ -154,7 +154,7 @@ void Validator::initialise(){
     //
 
     // other special rules
-    enpassen_square = 0;
+    enpassen_square = -1;
     white_castle_ks = true;
     white_castle_qs = true;
     black_castle_ks = true;
@@ -353,7 +353,17 @@ bool Validator::is_valid_pawn_move(int from_square, uint64_t to_mask, int player
     //
 
     // en passen
+    if(to_mask == (1ULL << enpassen_square) && enpassen_square >= 0 && (pawn_captures & to_mask)){
+        if (occupied & to_mask) return false;
+        
+        int direction = (player_turn == 1) ? 8 : -8;
+        int captured_square = __builtin_ctzll(to_mask) - direction;
 
+        uint64_t captured_mask = (1ULL << captured_square);
+
+        if(player_turn == 1) return (board.get_black_pieces() & captured_mask) != 0;
+        return (board.get_white_pieces() & captured_mask) != 0;
+    }
     //
 
     // promotion
@@ -560,7 +570,7 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
         return false;
     }
     //
-    
+        
     return 1;
 }
 //

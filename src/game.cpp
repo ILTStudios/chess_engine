@@ -51,7 +51,7 @@ void Game::run(string MOVESET, bool automatic){
             to_index = input.get_input_to();
 
             make_move();
-            this_thread::sleep_for(chrono::milliseconds(50));
+            // this_thread::sleep_for(chrono::milliseconds(500));
         }
     }
 }
@@ -78,7 +78,15 @@ void Game::make_move(){
     //
 
     char piece = validator.what_piece((1ULL << from_index), board);
-    
+
+    // check if en_passen
+    bool is_en_passant = (piece == 'P' || piece == 'p') && to_index == validator.enpassen_square && (from_index % 8 != to_index % 8);
+    if(is_en_passant){
+        int direction = (player_turn == 1) ? 8 : -8;
+        int captured_square = to_index - direction;
+
+        board.remove_piece(captured_square);
+    }
     // check if casteling and then move rook pls
     if (piece == 'K' || piece == 'k') {
         if (abs(from_index - to_index) == 2) {
@@ -91,14 +99,27 @@ void Game::make_move(){
     
     // change the board state
     board.move_piece(from_index, to_index);
+
+        // update all the special move cases
+    validator.enpassen_square = -1;
+    if ((piece == 'P' || piece == 'p') && abs(from_index - to_index) == 16) validator.enpassen_square = (from_index + to_index) / 2;
+
+    string promotion_piece = input.get_promotion_piece();
+    if(!promotion_piece.empty()){
+        if (piece == 'P' && to_index >= 56) {
+            board.promote_piece(to_index, promotion_piece[0]);
+        }
+        else if (piece == 'p' && to_index <= 7) {
+            board.promote_piece(to_index, promotion_piece[0]);
+        }
+    }
+    
+    validator.update_castleing_rights(from_index, to_index);
     //
 
     // display board
     board.display();
     //
-
-    // update the casteling rights after each move
-    validator.update_castleing_rights(from_index, to_index);
 
     // switch player
     player_turn = (player_turn == 1) ? 0 : 1;

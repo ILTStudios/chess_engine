@@ -11,6 +11,10 @@ int Input::get_input_to(){
     return to_index;
 }
 
+string Input::get_promotion_piece(){
+    return promotion_piece;
+}
+
 // converts a string input (e2) into a integer index (13)
 int string_to_index(string square){
     int file = tolower(square[0]) - 'a';
@@ -37,8 +41,8 @@ bool on_board(string square){
 
 int Input::authenticate_input(string move){
     // does this follow our convention for input?
-    if(move.length() != 4){
-        cout << "Please input from square to which square you would like to move (eg: e2e4)";
+    if(move.length() > 5){
+        cout << "Please input from square to which square you would like to move (eg: e2e4, or if promoting e7e8q,n,b,r)";
         return 0;
     }
     if(!on_board(move)){
@@ -53,6 +57,11 @@ int Input::authenticate_input(string move){
 
         from_index = string_to_index(from_square);
         to_index = string_to_index(to_square);
+
+        if(move.length() == 5){
+            promotion_piece = move[4];
+        }
+        promotion_piece = '\0';
         //
 
         return 1; //change validate so that the next player has a go

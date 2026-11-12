@@ -12,10 +12,12 @@ int main(){
     {
         cin.clear();
         cin.ignore(100, '\n');
+
         string moveset;
         cout << "Choose the moveset you would like to play through: ";
         getline(cin, moveset);
         cin.clear(); cin.ignore(100, '\n');
+
         string FEN;
         cout << "What FEN would you like to use? (std for normal start): ";
         cin >> FEN;
@@ -29,9 +31,11 @@ int main(){
     else{
         Game game;
         cin.clear(); cin.ignore(100, '\n');
+
         string FEN;
         cout << "What FEN would you like to use? (std for normal start): ";
         cin >> FEN;
+        
         game.initialise(FEN);
         game.run("", false);
     }

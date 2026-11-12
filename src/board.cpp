@@ -127,6 +127,60 @@ void Board::remove_piece(uint64_t mask){
     black_rooks   &= ~mask;
     black_queen   &= ~mask;
     black_king    &= ~mask;
+
+    white_pieces = white_rooks | white_knights | white_bishops | white_queen | white_king | white_pawns;
+    black_pieces = black_rooks | black_knights | black_bishops | black_queen | black_king | black_pawns;
+    occupied_spaces = white_pieces | black_pieces;
+    empty_squares = ~occupied_spaces;
+}
+
+// promotes pawn
+void Board::promote_piece(int square, char promotion){
+    uint64_t mask = (1ULL << square);
+    bool white = (white_pawns & mask) != 0;
+    bool black = (black_pawns & mask) != 0;
+
+    // must be a pawn
+    if (!white && !black) return;
+
+    // remove the pawn
+    if (white) white_pawns &= ~mask;
+    else       black_pawns &= ~mask;
+
+    // add promoted piece
+    switch (promotion) {
+        case 'q':
+            if (white) white_queen |= mask;
+            else       black_queen |= mask;
+            break;
+
+        case 'r':
+            if (white) white_rooks |= mask;
+            else       black_rooks |= mask;
+            break;
+
+        case 'b':
+            if (white) white_bishops |= mask;
+            else       black_bishops |= mask;
+            break;
+
+        case 'n':
+            if (white) white_knights |= mask;
+            else       black_knights |= mask;
+            break;
+
+        default:
+            // Invalid promotion choice
+            if (white) white_pawns |= mask;
+            else       black_pawns |= mask;
+            return;
+    }
+
+    // update supplementary bitboards
+    white_pieces = white_rooks | white_knights | white_bishops | white_queen | white_king | white_pawns;
+    black_pieces = black_rooks | black_knights | black_bishops | black_queen | black_king | black_pawns;
+    occupied_spaces = white_pieces | black_pieces;
+    empty_squares = ~occupied_spaces;
 }
 
 // moves a piece and updates the board state
