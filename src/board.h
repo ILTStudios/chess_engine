@@ -57,16 +57,4 @@ class Board{
         uint64_t occupied_spaces;
         uint64_t empty_squares;
         //
-
-        // move validation biboards
-        uint64_t knight_moves[64];
-        uint64_t w_pawn_moves[64];
-        uint64_t w_pawn_captures[64];
-        uint64_t b_pawn_moves[64];
-        uint64_t b_pawn_captures[64];
-        uint64_t king_moves[64];
-        uint64_t rook_moves[64];
-        uint64_t bishop_moves[64];
-        uint64_t queen_moves[64];
-        //
 };
