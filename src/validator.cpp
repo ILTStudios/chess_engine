@@ -228,6 +228,33 @@ bool Validator::is_path_clear(int from_index, int to_index, const Board &board){
 }
     //
 
+    // checks whether a castle is valid
+bool Validator::is_valid_castle(int from_square, int to_square, int player_turn, const Board &board){
+    bool white = (player_turn == 1); // are we white?
+    int king_start = white ? 4 : 60; // if so our king should be here
+
+    // check whether king is on king start square
+    if (from_square != king_start) return false;
+    // check if the king is currently in check
+    if(is_in_check(board, player_turn)) return  false;
+
+    int rook_square;
+    int king_to_square;
+    int destination_square;
+    int opponent = white ? 0 : 1;
+
+    if(to_square == king_start + 2){
+
+    }
+    else if(to_square == king_start - 2){
+
+    }
+    else{
+        return false;
+    }
+}
+    //
+
     // piece by piece breakdown of whether a move is a valid pnbqrk move or not
 bool Validator::is_valid_pawn_move(int from_square, uint64_t to_mask, int player_turn, const Board &board){
     uint64_t occupied = board.get_white_pieces() | board.get_black_pieces(); // get all occupied bits

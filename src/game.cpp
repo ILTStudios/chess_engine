@@ -32,7 +32,7 @@ void Game::run(string MOVESET, bool automatic){
         to_index = input.get_input_to();
 
         make_move();
-        }   
+        }
     }
     else{
         vector<string> moves;
@@ -42,7 +42,10 @@ void Game::run(string MOVESET, bool automatic){
         while (ss >> move) {
             moves.push_back(move);
         }
+
         for (string move : moves){
+            if (has_ended) break;
+            
             input.authenticate_input(move);
             from_index = input.get_input_from();
             to_index = input.get_input_to();

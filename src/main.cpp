@@ -6,17 +6,20 @@ using namespace std;
 
 int main(){
     int auto_play;
-    cout << "Choose your play type (1/0):";
+    cout << "Would you like to play move by move (0) or input a moveset string (1) eg: 'e2e4 e7e5': ";
     cin >> auto_play;
     if (auto_play == 1)
     {
         cin.clear();
         cin.ignore(100, '\n');
+        string moveset;
+        cout << "Choose the moveset you would like to play through: ";
+        getline(cin, moveset);
 
         Game game;
         game.initialise("");
         cout << "We have initalised!" << endl;
-        game.run("e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 g8f6 d2d3 d7d6 b1d2 c8e6", true);
+        game.run(moveset, true);
     }
 
     else{
