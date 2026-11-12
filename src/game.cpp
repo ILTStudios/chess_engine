@@ -51,7 +51,7 @@ void Game::run(string MOVESET, bool automatic){
             to_index = input.get_input_to();
 
             make_move();
-            this_thread::sleep_for(chrono::milliseconds(100));
+            this_thread::sleep_for(chrono::milliseconds(50));
         }
     }
 }
@@ -77,12 +77,31 @@ void Game::make_move(){
     }
     //
 
+    char piece = validator.what_piece((1ULL << from_index), board);
+    
+    // check if casteling and then move rook pls
+    if (piece == 'K' || piece == 'k') {
+        if (abs(from_index - to_index) == 2) {
+            // ks
+            if (to_index > from_index) board.move_piece(from_index + 3, from_index + 1);
+            // qs
+            else board.move_piece(from_index - 4, from_index - 1);
+        }
+    }
+    
     // change the board state
     board.move_piece(from_index, to_index);
     //
 
     // display board
     board.display();
+    //
+
+    // update the casteling rights after each move
+    validator.update_castleing_rights(from_index, to_index);
+
+    // switch player
+    player_turn = (player_turn == 1) ? 0 : 1;
     //
 
     // check whether you are in stalemate or checkmate
@@ -94,9 +113,5 @@ void Game::make_move(){
         has_ended = true;
         cout << "The game has ended in stalemate!" << endl; 
     }
-    //
-
-    // switch player
-    player_turn = (player_turn == 1) ? 0 : 1;
     //
 }

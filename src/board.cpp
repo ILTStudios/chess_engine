@@ -13,7 +13,7 @@ void Board::initialise(string FEN){
     black_rooks = black_knights = black_bishops = black_queen = black_king = black_pawns = 0ULL;
     //
 
-    if (FEN.empty()) {
+    if (FEN == "std") {
         FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     }
 

@@ -177,7 +177,7 @@ bool is_own_piece(uint64_t from_square, uint64_t to_square, int player_turn, con
 
 // checks what kind of piece you are trying to move
 // outputs FEN std piece name 'pnbrqk'
-char what_piece(uint64_t from_mask, const Board &board){
+char Validator::what_piece(uint64_t from_mask, const Board &board){
     if      (board.get_white_pawns() & from_mask)   return 'P';
     else if (board.get_white_knights() & from_mask) return 'N';
     else if (board.get_white_bishops() & from_mask) return 'B';
@@ -368,15 +368,12 @@ bool Validator::is_valid_bishop_move(int from_square, uint64_t to_mask, const Bo
     return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
 bool Validator::is_valid_rook_move(int from_square, uint64_t to_mask, const Board &board){
-    
-    // casteling
-
-    //
-
     if (!(rook_moves[from_square] & to_mask)) return false;
     return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
-bool Validator::is_valid_king_move(int from_square, uint64_t to_mask){return (king_moves[from_square] & to_mask) != 0;}
+bool Validator::is_valid_king_move(int from_square, uint64_t to_mask){
+    return (king_moves[from_square] & to_mask) != 0;
+}
 bool Validator::is_valid_queen_move(int from_square, uint64_t to_mask, const Board &board){
     if (!(queen_moves[from_square] & to_mask)) return false;
     return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
@@ -388,6 +385,7 @@ bool Validator::is_valid_queen_move(int from_square, uint64_t to_mask, const Boa
 bool Validator::is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_turn, const Board &board){
     char piece_type = what_piece(from_mask, board);
     int from_index = __builtin_ctzll(from_mask);
+    int to_index = __builtin_ctzll(to_mask);
 
     switch (piece_type) {
         case 'P':
@@ -412,6 +410,18 @@ bool Validator::is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_t
 
         case 'K':
         case 'k':
+            if (from_index == 4 && to_mask == (1ULL << 6)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
+            if (from_index == 4 && to_mask == (1ULL << 2)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
+            if (from_index == 60 && to_mask == (1ULL << 62)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
+            if (from_index == 60 && to_mask == (1ULL << 58)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
             return is_valid_king_move(from_index, to_mask);
 
         default:
@@ -493,6 +503,12 @@ bool Validator::has_legal_moves(const Board &board, int player_turn){
             if(!is_valid(player_turn, from_square, to_square, board)) continue; // that kind of movement is not valid
             Board temporary_brd = board; // mk a temp board
             temporary_brd.move_piece(from_square, to_square); // make that move
+                // and move the rook too
+            if ((what_piece(1ULL << from_square, board) == 'K' || what_piece(1ULL << from_square, board) == 'k') && abs(from_square - to_square) == 2) {
+                if (to_square > from_square) temporary_brd.move_piece(from_square + 3, from_square + 1);
+                else temporary_brd.move_piece(from_square - 4, from_square - 1);
+            }
+                //
             if(!is_in_check(temporary_brd, player_turn)) return true; // if that move does not leave you in check, wallahi you made it and there are legal moves
         }
 
@@ -534,13 +550,16 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
     // is the king in check?
     Board temporary_board = board;
     temporary_board.move_piece(from_square, to_square);
-
+        //  and move the rook too if its a castle
+    if ((what_piece(from_mask, board) == 'K' || what_piece(from_mask, board) == 'k') &&abs(from_square - to_square) == 2) {
+        if (to_square > from_square) temporary_board.move_piece(from_square + 3, from_square + 1);
+        else temporary_board.move_piece(from_square - 4, from_square - 1);            
+    }
+        //
     if(is_in_check(temporary_board, player_turn)){
         return false;
     }
     //
-
-    update_castleing_rights(from_square, to_square);
     
     return 1;
 }
