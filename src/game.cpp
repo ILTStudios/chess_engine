@@ -16,7 +16,6 @@ void Game::initialise(string FEN){
 
     // initialise and display the board
     board.initialise(FEN);
-    board.display();
     //
 
     // initialise the validator
@@ -51,6 +50,7 @@ void Game::run(string MOVESET, bool automatic){
             to_index = input.get_input_to();
 
             make_move();
+            board.display();
             this_thread::sleep_for(chrono::milliseconds(50));
         }
     }

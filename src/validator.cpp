@@ -28,7 +28,7 @@ void Validator::init_knight_moves(){
         }
         knight_moves[square] = moves;
     }
-    cout << "Successfully generated all knight moves!" << endl;
+    // cout << "Successfully generated all knight moves!" << endl;
 }
 void Validator::init_king_moves(){
     int rank_offsets[] = {-1, -1, -1, 0, 0, 1, 1, 1};
@@ -52,7 +52,7 @@ void Validator::init_king_moves(){
 
         king_moves[square] = moves;
     }
-    cout << "Successfully generated all king moves!" << endl;
+    // cout << "Successfully generated all king moves!" << endl;
 }
 void Validator::init_pawn_moves(){
     for(int square = 0; square < 64; square += 1){
@@ -81,7 +81,7 @@ void Validator::init_pawn_moves(){
         b_pawn_captures[square] = b_captures;
         b_pawn_moves[square] = b_moves;
     }
-    cout << "Successfully generated all pawns moves!" << endl;
+    // cout << "Successfully generated all pawns moves!" << endl;
 }
 void Validator::init_rook_moves(){
     int rank_offsets[] = {1, -1, 0, 0};
@@ -106,7 +106,7 @@ void Validator::init_rook_moves(){
 
         rook_moves[square] = moves;
     }
-    cout << "Successfully generated all rook moves!" << endl;
+    // cout << "Successfully generated all rook moves!" << endl;
 }
 void Validator::init_bishop_moves(){
     int rank_offsets[] = {1, 1, -1, -1};
@@ -131,7 +131,7 @@ void Validator::init_bishop_moves(){
         bishop_moves[square] = moves;
     }
 
-    cout << "Sucessfully generated all bishop moves!" << endl;
+    // cout << "Sucessfully generated all bishop moves!" << endl;
 }
 //
 
@@ -165,8 +165,7 @@ void Validator::initialise(){
 }
 //
 
-// checks whether you are actively trying to attack your own piece, 
-// or moving smth that isn't yours
+// checks whether you are actively trying to attack your own piece, or moving smth that isn't yours
 bool is_own_piece(uint64_t from_square, uint64_t to_square, int player_turn, const Board &board){
     uint64_t own_pieces = (player_turn == 1) ? board.get_white_pieces() : board.get_black_pieces(); // pickout your pieces depending on player turn
     if (!(from_square & own_pieces)) return false; // is that your piece?

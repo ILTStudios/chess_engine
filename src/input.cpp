@@ -51,17 +51,17 @@ int Input::authenticate_input(string move){
     }
     //
     else{
-        // everything seems alright, change the from and to masks
+        // everything seems alright, change the from, to, and promotion piece variables
         string from_square = move.substr(0, 2);
         string to_square = move.substr(2, 2);
 
         from_index = string_to_index(from_square);
         to_index = string_to_index(to_square);
+        
         promotion_piece = "";
         if(move.length() == 5){
             promotion_piece = move.substr(4, 1);
         }
-
         //
 
         return 1; //change validate so that the next player has a go
@@ -76,12 +76,10 @@ void Input::get_input(int player_turn){
     {
         cout << "Player " << ( (player_turn == 1) ? "White, ": "Black, ") << "Choose your move: ";
         cin >> raw_input;
-        // is this a valid input?
-        // is this on the board?
+
         validate += authenticate_input(raw_input);
         cin.clear();
         cin.ignore(100, '\n');
     }
-    
     cout << endl;
 }
