@@ -51,22 +51,9 @@ void Game::run(string MOVESET, bool automatic){
             to_index = input.get_input_to();
 
             make_move();
-            // this_thread::sleep_for(chrono::milliseconds(500));
+            this_thread::sleep_for(chrono::milliseconds(50));
         }
     }
-}
-
-string Game::validate(){
-    if(!validator.is_valid(player_turn, from_index, to_index, board)) return "Invalid! Try again";
-    if(validator.is_in_checkmate(board, player_turn)) return "Checkmate! Game end";
-    if(validator.is_in_stalemate(board, player_turn)) return "Stalemate! Game end";
-
-    return "N/A";
-}
-
-void Game::update_game_state(int from, int to, int pt){
-    board.move_piece(from, to);
-    player_turn = pt;
 }
 
 void Game::make_move(){

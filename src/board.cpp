@@ -78,7 +78,7 @@ void Board::initialise(string FEN){
 }
 
 // displays the board
-void Board::display(){
+void Board::display(){        
     // we count backwards from black to white, so from rank 8 to 1
     for(int rank = 7; rank >= 0; rank -= 1){
         cout << (rank + 1) << " "; // display the rank we are on
@@ -110,6 +110,8 @@ void Board::display(){
         cout << endl;
     }
     cout << "  A B C D E F G H\n\n";
+    
+    cout << "\033[10A"; // ensures we only output one board, not several
 }
 
 // removes whatever piece and mask align

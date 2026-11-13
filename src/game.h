@@ -17,9 +17,7 @@ class Game{
         void initialise(string FEN); // initialises the game
         void get_input(); // redundant, don't really need it for browser
         void make_move(); // redundant too
-        string validate();
-        void update_game_state(int from, int to, int pt);
-        void run(string MOVESET, bool automatic);
+        void run(string MOVESET, bool automatic); // main entrance to run the chess board
         //
     private:
         // variables
