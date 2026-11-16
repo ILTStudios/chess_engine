@@ -92,21 +92,28 @@ void Validator::init_rook_moves(){
         int file = square % 8;
 
         uint64_t moves = 0;
+        uint64_t masks = 0;
 
         for(int i = 0; i < 4; i += 1){
             int new_rank = rank + rank_offsets[i];
             int new_file = file + file_offsets[i];
 
             while(new_rank >= 0 && new_rank < 8 && new_file >= 0 && new_file < 8){
+                if (new_rank > 0 && new_rank < 7 && new_file > 0 && new_file < 7)
+                {
+                    masks |= (1ULL << (new_rank * 8 + new_file)); // purely for the magic bitboard
+                }
+                
                 moves |= (1ULL << ((new_rank * 8) + new_file));
                 new_rank += rank_offsets[i];
                 new_file += file_offsets[i];
             }
         }
-
+        rook_masks[square] = masks;
         rook_moves[square] = moves;
     }
-    // cout << "Successfully generated all rook moves!" << endl;
+
+
 }
 void Validator::init_bishop_moves(){
     int rank_offsets[] = {1, 1, -1, -1};
@@ -117,23 +124,43 @@ void Validator::init_bishop_moves(){
         int file = square % 8;
 
         uint64_t moves = 0;
+        uint64_t masks = 0;
 
         for(int i = 0; i < 4; i += 1){
             int new_rank = rank + rank_offsets[i];
             int new_file = file + file_offsets[i];
 
             while(new_rank >= 0 && new_rank < 8 && new_file >= 0 && new_file < 8){
+                if (new_rank > 0 && new_rank < 7 && new_file > 0 && new_file < 7)
+                {
+                    masks |= (1ULL << (new_rank * 8 + new_file)); // purely for the magic bitboards
+                }
                 moves |= (1ULL << ((new_rank * 8) + new_file));
                 new_rank += rank_offsets[i];
                 new_file += file_offsets[i];
             }
         }
+        bishop_masks[square] = masks;
         bishop_moves[square] = moves;
     }
 
     // cout << "Sucessfully generated all bishop moves!" << endl;
 }
 //
+
+// magic bitboard
+uint64_t Validator::set_occupancy(int index, int bits_in_mask, uint64_t mask){
+    uint64_t occupancy = 0;
+    for (int count = 0; count < bits_in_mask; count++) {
+        int square = __builtin_ctzll(mask);
+        mask &= mask - 1;
+        if (index & (1 << count)) {
+            occupancy |= (1ULL << square);
+        }
+    }
+    return occupancy;
+}
+// 
 
 // initialises the validator class
 void Validator::initialise(){
@@ -160,21 +187,8 @@ void Validator::initialise(){
     black_castle_ks = true;
     black_castle_qs = true;
     //
-
-    cout << endl;
 }
 //
-
-// checks whether you are actively trying to attack your own piece, or moving smth that isn't yours
-bool is_own_piece(uint64_t from_square, uint64_t to_square, int player_turn, const Board &board){
-    uint64_t own_pieces = (player_turn == 1) ? board.get_white_pieces() : board.get_black_pieces(); // pickout your pieces depending on player turn
-    if (!(from_square & own_pieces)) return false; // is that your piece?
-    if (to_square & own_pieces) return false; // cannot capture your own piece
-    return true;    
-}
-//
-
-
 
 // is_valid_move supplementary functions
     // checks whether your path is clear or not
@@ -368,55 +382,6 @@ bool Validator::is_valid_queen_move(int from_square, uint64_t to_mask, const Boa
     //
 //
 
-// checks whether that was a valid move according to that piece
-bool Validator::is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_turn, const Board &board){
-    char piece_type = board.get_piece(from_mask);
-    int from_index = __builtin_ctzll(from_mask);
-    int to_index = __builtin_ctzll(to_mask);
-
-    switch (piece_type) {
-        case 'P':
-        case 'p':
-            return is_valid_pawn_move(from_index, to_mask, player_turn, board);
-
-        case 'N':
-        case 'n':
-            return is_valid_knight_move(from_index, to_mask);
-
-        case 'B':
-        case 'b':
-            return is_valid_bishop_move(from_index, to_mask, board);
-
-        case 'R':
-        case 'r':
-            return is_valid_rook_move(from_index, to_mask, board);
-
-        case 'Q':
-        case 'q':
-            return is_valid_queen_move(from_index, to_mask, board);
-
-        case 'K':
-        case 'k':
-            if (from_index == 4 && to_mask == (1ULL << 6)){
-                return is_valid_castle(from_index, to_index, player_turn, board);
-            }
-            if (from_index == 4 && to_mask == (1ULL << 2)){
-                return is_valid_castle(from_index, to_index, player_turn, board);
-            }
-            if (from_index == 60 && to_mask == (1ULL << 62)){
-                return is_valid_castle(from_index, to_index, player_turn, board);
-            }
-            if (from_index == 60 && to_mask == (1ULL << 58)){
-                return is_valid_castle(from_index, to_index, player_turn, board);
-            }
-            return is_valid_king_move(from_index, to_mask);
-
-        default:
-            return false;
-    }
-}
-//
-
 // checks whether a square is attacked (required for is in check)
 bool Validator::is_square_attacked(int square, int player_turn, const Board &board){
     uint64_t attack_mask = (1ULL << square); // a mask of the piece that is attacked 
@@ -505,7 +470,63 @@ bool Validator::has_legal_moves(const Board &board, int player_turn){
     return false;
 }
 
+// checks whether you are actively trying to attack your own piece, or moving smth that isn't yours
+bool is_own_piece(uint64_t from_square, uint64_t to_square, int player_turn, const Board &board){
+    uint64_t own_pieces = (player_turn == 1) ? board.get_white_pieces() : board.get_black_pieces(); // pickout your pieces depending on player turn
+    if (!(from_square & own_pieces)) return false; // is that your piece?
+    if (to_square & own_pieces) return false; // cannot capture your own piece
+    return true;    
+}
+//
 
+// checks whether that was a valid move according to that piece
+bool Validator::is_valid_move(int from_index, int to_index, int player_turn, const Board &board){
+    uint64_t from_mask = (1ULL << from_index);
+    uint64_t to_mask = (1ULL << to_index);
+    char piece_type = board.get_piece(from_mask);
+
+    switch (piece_type) {
+        case 'P':
+        case 'p':
+            return is_valid_pawn_move(from_index, to_mask, player_turn, board);
+
+        case 'N':
+        case 'n':
+            return is_valid_knight_move(from_index, to_mask);
+
+        case 'B':
+        case 'b':
+            return is_valid_bishop_move(from_index, to_mask, board);
+
+        case 'R':
+        case 'r':
+            return is_valid_rook_move(from_index, to_mask, board);
+
+        case 'Q':
+        case 'q':
+            return is_valid_queen_move(from_index, to_mask, board);
+
+        case 'K':
+        case 'k':
+            if (from_index == 4 && to_mask == (1ULL << 6)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
+            if (from_index == 4 && to_mask == (1ULL << 2)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
+            if (from_index == 60 && to_mask == (1ULL << 62)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
+            if (from_index == 60 && to_mask == (1ULL << 58)){
+                return is_valid_castle(from_index, to_index, player_turn, board);
+            }
+            return is_valid_king_move(from_index, to_mask);
+
+        default:
+            return false;
+    }
+}
+//
 
 // main big boy function that posts to public
 // and is calling the rest of all our functions
@@ -521,7 +542,7 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
     //
 
     // checks whether that was a valid move according to what piece it is
-    if(!is_valid_move(from_mask, to_mask, player_turn, board)){
+    if(!is_valid_move(from_square, to_square, player_turn, board)){
         // cout << "That is not a valid move! Try again" << endl;
         return 0;
     }

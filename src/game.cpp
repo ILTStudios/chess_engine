@@ -72,7 +72,7 @@ void Game::make_move(){
         int direction = (player_turn == 1) ? 8 : -8;
         int captured_square = to_index - direction;
 
-        board.remove_piece(captured_square);
+        board.remove_piece((1ULL << captured_square));
     }
     // check if casteling and then move rook pls
     if (piece == 'K' || piece == 'k') {
