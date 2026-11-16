@@ -174,26 +174,7 @@ bool is_own_piece(uint64_t from_square, uint64_t to_square, int player_turn, con
 }
 //
 
-// checks what kind of piece you are trying to move
-// outputs FEN std piece name 'pnbrqk'
-// char Validator::what_piece(uint64_t from_mask, const Board &board){
-//     if      (board.get_white_pawns() & from_mask)   return 'P';
-//     else if (board.get_white_knights() & from_mask) return 'N';
-//     else if (board.get_white_bishops() & from_mask) return 'B';
-//     else if (board.get_white_rooks() & from_mask)   return 'R';
-//     else if (board.get_white_queen() & from_mask)   return 'Q';
-//     else if (board.get_white_king() & from_mask)    return 'K';
-    
-//     else if (board.get_black_pawns() & from_mask)   return 'p';
-//     else if (board.get_black_knights() & from_mask) return 'n';
-//     else if (board.get_black_bishops() & from_mask) return 'b';
-//     else if (board.get_black_rooks() & from_mask)   return 'r';
-//     else if (board.get_black_queen() & from_mask)   return 'q';
-//     else if (board.get_black_king() & from_mask)    return 'k';
 
-//     return '.'; // Empty square
-// }
-// //
 
 // is_valid_move supplementary functions
     // checks whether your path is clear or not
@@ -524,14 +505,7 @@ bool Validator::has_legal_moves(const Board &board, int player_turn){
     return false;
 }
 
-// simple functions that figure out if you are in checkmate or stalemate
-bool Validator::is_in_checkmate(const Board &board, int player_turn){
-    return is_in_check(board, player_turn) && !has_legal_moves(board, player_turn);
-}
-bool Validator::is_in_stalemate(const Board &board, int player_turn){
-    return !is_in_check(board, player_turn) && !has_legal_moves(board, player_turn);
-}
-//
+
 
 // main big boy function that posts to public
 // and is calling the rest of all our functions

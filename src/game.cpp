@@ -113,11 +113,11 @@ void Game::make_move(){
     //
 
     // check whether you are in stalemate or checkmate
-    if(validator.is_in_checkmate(board, player_turn) == true){
+    if(validator.is_in_check(board, player_turn) && !validator.has_legal_moves(board, player_turn)){
         has_ended = true;
         cout << "The game has ended in checkmate!" << endl;
     }
-    if(validator.is_in_stalemate(board, player_turn) == true){
+    if(!validator.is_in_check(board, player_turn) && !validator.has_legal_moves(board, player_turn)){
         has_ended = true;
         cout << "The game has ended in stalemate!" << endl; 
     }
