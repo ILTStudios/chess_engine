@@ -220,6 +220,25 @@ void Board::move_piece(int from_square, int to_square){
     //
 }
 
+// gets the piece type of whatever is on that square
+char Board::get_piece(uint64_t from_mask) const{
+    if      (white_pawns & from_mask)   return 'P';
+    else if (white_knights & from_mask) return 'N';
+    else if (white_bishops & from_mask) return 'B';
+    else if (white_rooks & from_mask)   return 'R';
+    else if (white_queen & from_mask)   return 'Q';
+    else if (white_king & from_mask)    return 'K';
+    
+    else if (black_pawns & from_mask)   return 'p';
+    else if (black_knights & from_mask) return 'n';
+    else if (black_bishops & from_mask) return 'b';
+    else if (black_rooks & from_mask)   return 'r';
+    else if (black_queen & from_mask)   return 'q';
+    else if (black_king & from_mask)    return 'k';
+
+    return '.'; // Empty square
+}
+
 // getter functions for all board private variables
     // white
 uint64_t Board::get_white_pawns() const{

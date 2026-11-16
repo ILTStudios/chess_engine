@@ -20,7 +20,6 @@ void display_menu(){
 }
 
 int main(){
-    int auto_play;
     int menu_option;
 
     do
@@ -38,6 +37,7 @@ int main(){
             }
             case 2:{
                 cout << "Playing against Computer... \n";
+                Player player;
                 Game game;
                 game.initialise("std");
                 game.run("", false);

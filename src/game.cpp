@@ -64,7 +64,7 @@ void Game::make_move(){
     }
     //
 
-    char piece = validator.what_piece((1ULL << from_index), board);
+    char piece = board.get_piece(1ULL << from_index);
 
     // check if en_passen
     bool is_en_passant = (piece == 'P' || piece == 'p') && to_index == validator.enpassen_square && (from_index % 8 != to_index % 8);

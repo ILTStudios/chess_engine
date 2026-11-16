@@ -9,7 +9,7 @@ class Validator{
         void initialise(); // initialises all validation data
         bool is_in_checkmate(const Board &board, int player_turn);
         bool is_in_stalemate(const Board &board, int player_turn);
-        char what_piece(uint64_t from_mask, const Board &board);
+        // char what_piece(uint64_t from_mask, const Board &board);
         void update_castleing_rights(int from_square, int to_square);
         int enpassen_square;
 

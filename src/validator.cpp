@@ -176,24 +176,24 @@ bool is_own_piece(uint64_t from_square, uint64_t to_square, int player_turn, con
 
 // checks what kind of piece you are trying to move
 // outputs FEN std piece name 'pnbrqk'
-char Validator::what_piece(uint64_t from_mask, const Board &board){
-    if      (board.get_white_pawns() & from_mask)   return 'P';
-    else if (board.get_white_knights() & from_mask) return 'N';
-    else if (board.get_white_bishops() & from_mask) return 'B';
-    else if (board.get_white_rooks() & from_mask)   return 'R';
-    else if (board.get_white_queen() & from_mask)   return 'Q';
-    else if (board.get_white_king() & from_mask)    return 'K';
+// char Validator::what_piece(uint64_t from_mask, const Board &board){
+//     if      (board.get_white_pawns() & from_mask)   return 'P';
+//     else if (board.get_white_knights() & from_mask) return 'N';
+//     else if (board.get_white_bishops() & from_mask) return 'B';
+//     else if (board.get_white_rooks() & from_mask)   return 'R';
+//     else if (board.get_white_queen() & from_mask)   return 'Q';
+//     else if (board.get_white_king() & from_mask)    return 'K';
     
-    else if (board.get_black_pawns() & from_mask)   return 'p';
-    else if (board.get_black_knights() & from_mask) return 'n';
-    else if (board.get_black_bishops() & from_mask) return 'b';
-    else if (board.get_black_rooks() & from_mask)   return 'r';
-    else if (board.get_black_queen() & from_mask)   return 'q';
-    else if (board.get_black_king() & from_mask)    return 'k';
+//     else if (board.get_black_pawns() & from_mask)   return 'p';
+//     else if (board.get_black_knights() & from_mask) return 'n';
+//     else if (board.get_black_bishops() & from_mask) return 'b';
+//     else if (board.get_black_rooks() & from_mask)   return 'r';
+//     else if (board.get_black_queen() & from_mask)   return 'q';
+//     else if (board.get_black_king() & from_mask)    return 'k';
 
-    return '.'; // Empty square
-}
-//
+//     return '.'; // Empty square
+// }
+// //
 
 // is_valid_move supplementary functions
     // checks whether your path is clear or not
@@ -380,7 +380,7 @@ bool Validator::is_valid_rook_move(int from_square, uint64_t to_mask, const Boar
 bool Validator::is_valid_king_move(int from_square, uint64_t to_mask){
     return (king_moves[from_square] & to_mask) != 0;
 }
-bool Validator::is_valid_queen_move(int from_square, uint64_t to_mask, const Board &board){
+bool Validator::is_valid_queen_move(int from_square, uint64_t to_mask, const Board& board){
     if (!(queen_moves[from_square] & to_mask)) return false;
     return is_path_clear(from_square, __builtin_ctzll(to_mask), board);
 }
@@ -389,7 +389,7 @@ bool Validator::is_valid_queen_move(int from_square, uint64_t to_mask, const Boa
 
 // checks whether that was a valid move according to that piece
 bool Validator::is_valid_move(uint64_t from_mask, uint64_t to_mask, int player_turn, const Board &board){
-    char piece_type = what_piece(from_mask, board);
+    char piece_type = board.get_piece(from_mask);
     int from_index = __builtin_ctzll(from_mask);
     int to_index = __builtin_ctzll(to_mask);
 
@@ -444,7 +444,7 @@ bool Validator::is_square_attacked(int square, int player_turn, const Board &boa
     while(attacking_pieces){
         int from_square = __builtin_ctzll(attacking_pieces); // check the last piece
         uint64_t from_mask = (1ULL << from_square); // make a mask
-        char piece = what_piece(from_mask, board); // figure out what piece it is
+        char piece = board.get_piece(from_mask); // figure out what piece it is
         // iterate over each piece type and figure out if that attack is true or not
         switch (piece)
         {
@@ -510,7 +510,7 @@ bool Validator::has_legal_moves(const Board &board, int player_turn){
             Board temporary_brd = board; // mk a temp board
             temporary_brd.move_piece(from_square, to_square); // make that move
                 // and move the rook too
-            if ((what_piece(1ULL << from_square, board) == 'K' || what_piece(1ULL << from_square, board) == 'k') && abs(from_square - to_square) == 2) {
+            if ((board.get_piece(1ULL << from_square) == 'K' || board.get_piece(1ULL << from_square) == 'k') && abs(from_square - to_square) == 2) {
                 if (to_square > from_square) temporary_brd.move_piece(from_square + 3, from_square + 1);
                 else temporary_brd.move_piece(from_square - 4, from_square - 1);
             }
@@ -557,7 +557,7 @@ bool Validator::is_valid(int player_turn, int from_square, int to_square, const 
     Board temporary_board = board;
     temporary_board.move_piece(from_square, to_square);
         //  and move the rook too if its a castle
-    if ((what_piece(from_mask, board) == 'K' || what_piece(from_mask, board) == 'k') &&abs(from_square - to_square) == 2) {
+    if ((board.get_piece(from_mask) == 'K' || board.get_piece(from_mask) == 'k') &&abs(from_square - to_square) == 2) {
         if (to_square > from_square) temporary_board.move_piece(from_square + 3, from_square + 1);
         else temporary_board.move_piece(from_square - 4, from_square - 1);            
     }
